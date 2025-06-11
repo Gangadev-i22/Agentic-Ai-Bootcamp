@@ -1,0 +1,190 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "51ba02f0-56a0-4bef-abec-8249e6270726",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "14EZSsQDDzViCtrj-lb7JNKYHNBATIZMrfP98Ab5oprk",
+          "mode": "list",
+          "cachedResultName": "Smart Daily Report ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14EZSsQDDzViCtrj-lb7JNKYHNBATIZMrfP98Ab5oprk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14EZSsQDDzViCtrj-lb7JNKYHNBATIZMrfP98Ab5oprk/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        220,
+        0
+      ],
+      "id": "e8c953dd-c016-4fad-8555-0f8f9371c4c5",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2Bxv7OsDKesvwkgF",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.all().map((item) => item.json);\nconst headers = Object.keys(data[0]).join(\" | \");\nconst divider = Object.keys(data[0])\n  .map(() => \"---\")\n  .join(\" | \");\n\nconst rows = data\n  .map((row) => {\n    return Object.values(row).join(\" | \");\n  })\n  .join(\"\\n\");\n\nconst markdownTable = `${headers}\\n${divider}\\n${rows}`;\n\nreturn { markdownTable };\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        0
+      ],
+      "id": "0d23fb82-c240-48fc-93b8-a46faabdadc9",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Act as a agent who works for me and your input is maerkdown table and i need output like classify updates\ninto categories like “Completed,” “Blocked,” and “Planned,” and generate a neatly formatted\nsummary email for managemenclassify updates\n\n\ninto categories like “Completed,” “Blocked,” and “Planned,” and generate a neatly formatted\nsummary email for management.And the mark down table is  {{ $json.markdownTable }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        543,
+        0
+      ],
+      "id": "f5d73006-f69a-422b-a766-3a35345a1808",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        580,
+        220
+      ],
+      "id": "ffcdfa0a-7abe-405e-bc44-3ab526fd0c85",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "FXBF8G7HQn08c6IS",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "da8.iqac@snsgroups.com,da3.iqac@snsgroups.com",
+        "subject": "smart daily report",
+        "emailType": "text",
+        "message": "=Here is the Task Summary Process {{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        920,
+        0
+      ],
+      "id": "68cb6704-c8bc-4311-ada7-d30aca127c61",
+      "name": "Gmail",
+      "webhookId": "941289af-6fa3-4df3-819d-8f4799c5dd03",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "x1HW9erPj2Oy36GY",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "05358660-33c7-4a8d-ae92-bfed77dcd587",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3281f938a430f028d6409ea9c76c4e4330117d0693856ff25ec00e603ab07b6c"
+  },
+  "id": "AjfSm6dfdJRlz6R7",
+  "tags": []
+}
