@@ -1,0 +1,9 @@
+streamlit
+langchain>=0.1.16
+langchain-core>=0.1.44
+langchain-community>=0.0.21
+langchain-google-genai>=0.0.6
+faiss-cpu
+sentence-transformers
+huggingface-hub
+pypdf
