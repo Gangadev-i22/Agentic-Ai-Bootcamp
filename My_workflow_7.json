@@ -1,0 +1,303 @@
+{
+  "name": "My workflow 7",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -560,
+        -180
+      ],
+      "id": "ce962b3a-1677-4f7a-bb13-4ba05cdc2d2b",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all().map((item) => item.json);\n\nconst markdown = items\n  .map((item) => {\n    return `## ${item.NAME}\n    - **Student ID**: ${item.Student_ID}\n    - **Department**: ${item.Department}\n    - **Year**: ${item.Year}\n    - **Status**: ${item.Status}\n    - **GPA**: ${item.GPA}\n    - **Attendance (%)**: ${item[\"Attendance (%)\"]}\n    - **Placement Status**: ${item.Placement_Status}\n    - **Report Date**: ${item.Report_Date}\n    `;\n  })\n  .join(\"\\n\");\n\nreturn { markdown };\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -220,
+        -180
+      ],
+      "id": "99bf4037-7c3b-49d8-bc11-1c09cabeaeb0",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=list out NAME of students who are Internship, Name the  students Not Placed, name the students got placed  {{ $json.markdown }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        -200
+      ],
+      "id": "da0cd946-68d0-46bb-bde7-867a30521ac5",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        140,
+        60
+      ],
+      "id": "e801ef81-3057-4fbe-98e7-0ae62e4a290a",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "9plb43Uzur35lOMm",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=name the departments and placed and not placed students {{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        220,
+        -200
+      ],
+      "id": "a5a40b5c-ca9f-46d6-9810-b2fa77681498",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        400,
+        80
+      ],
+      "id": "2f06f45e-abd4-40f9-b5d4-fbf0f4a3407c",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "9plb43Uzur35lOMm",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "13iRrrTHKWodp6S43iJfbNXNhABnMvhagKFKm0nIdBjM",
+          "mode": "list",
+          "cachedResultName": "DEPARTMENT  WISE REPORT",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13iRrrTHKWodp6S43iJfbNXNhABnMvhagKFKm0nIdBjM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/13iRrrTHKWodp6S43iJfbNXNhABnMvhagKFKm0nIdBjM/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -400,
+        -200
+      ],
+      "id": "17439c24-4e6d-4c19-9b09-e9446fe5c698",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2Bxv7OsDKesvwkgF",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1pt_cm-zBXzhte_37Uoy13I_n2dhRNizNP-Tyoa7xAcI",
+          "mode": "list",
+          "cachedResultName": "department",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pt_cm-zBXzhte_37Uoy13I_n2dhRNizNP-Tyoa7xAcI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1pt_cm-zBXzhte_37Uoy13I_n2dhRNizNP-Tyoa7xAcI/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        580,
+        -200
+      ],
+      "id": "c7eaa216-2337-49d8-85ef-53b5153c5b28",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2Bxv7OsDKesvwkgF",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Mailid }}",
+        "subject": " student list",
+        "emailType": "text",
+        "message": "={{ $('AI Agent').item.json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        800,
+        -200
+      ],
+      "id": "0c977b00-7ecb-4e39-955b-249fbaf546b9",
+      "name": "Gmail",
+      "webhookId": "04563ecd-ebaa-4ff8-ab61-cfd2bf9985cb",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "x1HW9erPj2Oy36GY",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5f051b29-9bb0-4f6d-8f59-0df55c72819e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3281f938a430f028d6409ea9c76c4e4330117d0693856ff25ec00e603ab07b6c"
+  },
+  "id": "4fLhLXr9fEmWtReP",
+  "tags": []
+}
